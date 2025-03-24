@@ -34,28 +34,37 @@ If you get "cannot change profile for the next exec call: No such file or direct
 1- Download debian 12 (debian-12-standard_12.2-1_amd64.tar.zst) ct template ( i don't know why, but i couldn't make it work with ubuntu ):
 
 pveam download local debian-12-standard_12.2-1_amd64.tar.zst
+
 2- Make a new CT with the following configurations:
 
 Make sure "Unprivileged Container" is unchecked, so it becomes privileged.
 Use downloaded debian template.
 Make sure sure swap is 0 in memory tab.
 NOTE: Don't start the CT yet.
+
 3- On the created CT go to options tab, double click on "Features" and enable "Fuse" and "Nesting".
+
 4- SSH into your Proxmox node and navigate to /etc/pve/lxc/, and open your {ct_id}.conf and add these few lines in:
 
 lxc.apparmor.profile: unconfined
 lxc.cap.drop:
 lxc.mount.auto: proc:rw sys:rw
 lxc.mount.entry: /sys/kernel/security sys/kernel/security none bind,create=file 0 0
+
 5- Start the CT
+
 6- Open your crontab using crontab -e and add this line at the end:
 
 @reboot ln -s /dev/console /dev/kmsg
+
 7- Install required apt packages:
 
 apt update && apt upgrade -y && apt install snapd squashfuse fuse sudo -y
+
 8- Reboot for changes to take effect.
+
 9- After the reboot, finally you can install microk8s:
 
 snap install microk8s --classic
+
 10- Enjoy your first microk8s on Proxmox 🎉
